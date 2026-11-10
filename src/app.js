@@ -3,7 +3,6 @@ const format = new Intl.NumberFormat('ko-KR', {
   minimumFractionDigits: 1, maximumFractionDigits: 1,
 });
 const exact = new Intl.NumberFormat('ko-KR', { maximumFractionDigits: 2 });
-const refresh = get('refresh');
 const weekSelect = get('weekSelect');
 const dateLabel = date => date.replaceAll('-', '. ') + '.';
 let displayedWeek = '';
@@ -99,7 +98,6 @@ function renderTrend(trend = []) {
 }
 
 async function loadBalances(requestedWeek) {
-  refresh.disabled = true;
   weekSelect.disabled = true;
   get('kpis').setAttribute('aria-busy', 'true');
   get('status').textContent = '';
@@ -109,9 +107,6 @@ async function loadBalances(requestedWeek) {
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || '잔액 조회에 실패했습니다.');
     const preview = data.mode === 'preview';
-    get('week').textContent = data.week;
-    get('mode').hidden = false;
-    get('mode').textContent = preview ? '미리보기' : '실시간 연동';
     weekSelect.replaceChildren(...data.weeks.map(week => new Option(week, week)));
     weekSelect.value = data.week;
     for (const [id, balance] of Object.entries(data.balances)) {
@@ -144,12 +139,10 @@ async function loadBalances(requestedWeek) {
       for (const id of ['krw', 'deposit', 'fx', 'total']) renderBalance(id, null, '조회 대기');
     }
   } finally {
-    refresh.disabled = false;
     weekSelect.disabled = !displayedWeek;
     get('kpis').setAttribute('aria-busy', 'false');
   }
 }
 
 weekSelect.addEventListener('change', () => loadBalances(weekSelect.value));
-refresh.addEventListener('click', () => loadBalances(displayedWeek));
 loadBalances();

@@ -118,14 +118,9 @@
 
   .kpi-grid{gap:16px;margin-bottom:22px}.kpi-card{position:relative;overflow:hidden;padding:21px;border:1px solid rgba(225,229,237,.92);border-radius:18px;background:#fff;box-shadow:var(--shadow);transition:.2s}.kpi-card:hover{transform:translateY(-2px);box-shadow:0 16px 36px rgba(24,34,56,.09)}.kpi-card::after{content:none!important;display:none!important}.kpi-label{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;font-size:12px;font-weight:700}.kpi-icon{width:34px;height:34px;display:grid;place-items:center;border-radius:11px;background:var(--accent-soft);color:#3559D9}.kpi-icon.income{background:#EAF8F2;color:#1F8A68}.kpi-icon.expense{background:var(--coral-soft);color:#C65C45}.kpi-icon.current{background:#EEF0F3;color:#4B5563}.kpi-icon svg{width:17px}.kpi-value{font-size:26px;font-weight:760;letter-spacing:-.8px}.kpi-sub{margin-top:10px}
   @media(max-width:900px){.sidebar{width:100%;height:auto;flex-direction:row}.brand{padding:10px 14px}.brand-mark{width:34px;height:34px;flex-basis:34px}.brand-copy{display:none}.nav{display:flex;padding:0;overflow-x:auto}.nav-group-label{display:none}.nav-item,.nav-item.sub{gap:6px;padding:11px 9px;margin:0 2px;font-size:11px;white-space:nowrap;border-radius:9px}.nav-item span{display:inline}.nav-item svg{width:15px}.nav-item.active{border-bottom:3px solid #718AF0}.topbar{min-height:62px;padding:10px 16px}.main{padding:16px}.kpi-card{padding:16px}}
-  .top-actions{display:flex;align-items:center;gap:8px}
   .week-select{font:inherit;font-size:13px;font-weight:650;color:var(--deep-navy);min-width:130px;padding:8px 10px;border:1px solid #E2E6EE;border-radius:10px;background:#fff}
   .week-select:disabled{color:var(--text-sub)}
-  .week-select:focus-visible,.refresh:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
-  .refresh{display:grid;place-items:center;width:36px;height:36px;border:1px solid var(--border);border-radius:10px;background:#fff;color:var(--navy);cursor:pointer}
-  .refresh:disabled{opacity:.45;cursor:wait}.refresh svg{width:17px}
-  .week-line{display:flex;align-items:center;gap:9px;margin:0 0 15px;color:var(--deep-navy);font-size:13px}
-  .mode{padding:3px 8px;border-radius:7px;background:var(--accent-soft);color:#304DB5;font-size:11px;font-weight:700}
+  .week-select:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
   .kpi-sub,.footer{color:var(--text-sub)}.kpi-value{font-variant-numeric:tabular-nums;white-space:nowrap}
   .load-error{padding:0;text-align:left;margin:0 0 16px}.load-error:empty{display:none}
   @media(max-width:520px){.page-title{font-size:17px}.week-select{font-size:12px;padding:7px}.nav{padding:5px 12px}.nav-item{width:auto}}
@@ -159,13 +154,10 @@
   <div class="content">
     <header class="topbar">
       <div class="page-title" role="heading" aria-level="1">대시보드</div>
-      <div class="top-actions">
-        <select class="week-select" id="weekSelect" aria-label="조회 주차" disabled><option value="">주차 확인 중</option></select>
-        <button class="refresh" id="refresh" type="button" aria-label="잔액 새로고침" title="잔액 새로고침" disabled><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2 6m2-11v5h-5"/></svg></button>
-      </div>
+      <select class="week-select" id="weekSelect" aria-label="조회 주차" disabled><option value="">주차 확인 중</option></select>
     </header>
     <main class="main">
-      <div class="week-line" aria-live="polite"><strong id="week">주간 잔액</strong><span class="mode" id="mode" hidden></span></div>
+
       <p id="status" class="load-error" role="status"></p>
       <div class="kpi-grid" id="kpis" aria-busy="true">
       <article class="kpi-card" id="krw" aria-label="수시원화 잔액">
