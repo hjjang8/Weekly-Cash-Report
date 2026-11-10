@@ -148,5 +148,6 @@ async function loadBalances(requestedWeek) {
   }
 }
 
+window.lucide?.createIcons();
 weekSelect.addEventListener('change', () => loadBalances(weekSelect.value));
 loadBalances();
