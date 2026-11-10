@@ -2,6 +2,9 @@ import { summarize } from './balances.mjs';
 
 const tokenUrl = 'https://oauth2.googleapis.com/token';
 const encoder = new TextEncoder();
+const MAX_UPSTREAM_BYTES = 5 * 1024 * 1024;
+const MAX_ROWS = 5000;
+const MAX_COLUMNS = 128;
 
 function base64url(bytes) {
   return btoa(String.fromCharCode(...bytes)).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '');
@@ -23,7 +26,10 @@ async function getJson(stage, url, init) {
       console.error('weekly-cash-report:', stage, 'HTTP', response.status);
       throw new Error('Google request failed');
     }
-    return response.json();
+    const body = await response.text();
+    const maxBytes = stage === 'sheet-values' ? MAX_UPSTREAM_BYTES : 256 * 1024;
+    if (Buffer.byteLength(body, 'utf8') > maxBytes) throw new Error('Upstream response exceeds safe size');
+    return JSON.parse(body);
   });
 }
 
@@ -83,6 +89,13 @@ export async function getWeek(config, requestedWeek, spreadsheetId) {
   const range = "'" + week.replaceAll("'", "''") + "'!C:O";
   const result = await getJson('sheet-values', sheetsUrl + '/values/' + encodeURIComponent(range) +
     '?valueRenderOption=UNFORMATTED_VALUE', init);
-  const summary = await atStage('balance-aggregation', () => summarize(week, result.values ?? []));
+  const summary = await atStage('balance-aggregation', () => {
+    const rows = result.values ?? [];
+    if (!Array.isArray(rows) || rows.length > MAX_ROWS ||
+        rows.some(row => !Array.isArray(row) || row.length > MAX_COLUMNS)) {
+      throw new Error('Spreadsheet data exceeds safe limits');
+    }
+    return summarize(week, rows);
+  });
   return { ...summary, weeks };
 }

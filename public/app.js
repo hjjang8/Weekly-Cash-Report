@@ -103,7 +103,11 @@ async function loadBalances(requestedWeek) {
   get('status').textContent = '';
   try {
     const query = requestedWeek ? '?' + new URLSearchParams({ week: requestedWeek }) : '';
-    const response = await fetch('/api/balances' + query, { cache: 'no-store' });
+    const response = await fetch('/api/balances' + query, {
+      cache: 'no-store',
+      credentials: 'same-origin',
+      headers: { Accept: 'application/json', 'X-Requested-With': 'AROPET-Dashboard' },
+    });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || '잔액 조회에 실패했습니다.');
     const preview = data.mode === 'preview';
