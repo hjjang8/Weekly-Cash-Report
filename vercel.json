@@ -1,0 +1,15 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "outputDirectory": "public",
+  "functions": {
+    "api/balances.js": {
+      "includeFiles": "src/**",
+      "maxDuration": 30
+    }
+  },
+  "rewrites": [
+    { "source": "/", "destination": "/api/balances?_report_asset=page" },
+    { "source": "/app.js", "destination": "/api/balances?_report_asset=script" }
+  ]
+}
