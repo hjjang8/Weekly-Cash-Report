@@ -4,18 +4,17 @@
 
 1. 이 저장소를 배포 소스로 사용합니다. `vercel.json`과 `package.json`이 있는 저장소 루트를 선택합니다.
 2. Vercel에서 **Add New → Project**를 선택하고 새 저장소를 가져옵니다. Framework Preset은 **Other**, Root Directory는 저장소 루트로 둡니다.
-3. Vercel의 프로젝트 환경변수에 다음 값을 추가합니다. `GOOGLE_API`와 `REPORT_PASSWORD`는 비밀값으로 저장합니다.
+3. Vercel의 프로젝트 환경변수에 다음 값을 추가합니다. `GOOGLE_API`는 비밀값으로 저장합니다.
 
    | 이름 | 값 |
    | --- | --- |
    | `GOOGLE_API` | Google Sheets API 사용이 설정된 서비스 계정의 JSON 키 전체 |
    | `GOOGLE_SHEET_ID` | 주간 구글시트 URL에서 `/d/` 다음부터 `/edit` 앞까지의 문서 ID |
-   | `REPORT_PASSWORD` | 주간 보고서에 사용할 길고 무작위인 비밀번호 |
 
 4. 연결할 Google 스프레드시트를 서비스 계정 JSON의 `client_email`에 **뷰어**로 공유합니다. 기존 월간 보고서에 쓰던 계정을 이용하는 경우에도 이 주간 시트에 별도로 뷰어 권한이 필요합니다.
-5. 배포한 주소를 열고 사용자 이름 **`report`**와 3단계에서 설정한 비밀번호로 로그인합니다. 이후 환경변수 값을 바꾸면 새로 배포합니다.
+5. 배포한 주소에서 대시보드를 엽니다. 환경변수 값을 바꾸면 새로 배포합니다.
 
-Google 서비스 계정 키, 시트 ID, 보고서 비밀번호는 Vercel 환경변수에서 관리합니다.
+Google 서비스 계정 키와 시트 ID는 Vercel 환경변수에서 관리합니다.
 
 ## 데이터 집계
 

@@ -1,10 +1,8 @@
-import { createHash, timingSafeEqual } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { getWeek } from '../src/google.mjs';
 
 const headers = {
   'Cache-Control': 'private, no-store',
-  'Vary': 'Authorization',
   'X-Content-Type-Options': 'nosniff',
   'Referrer-Policy': 'no-referrer',
   'X-Robots-Tag': 'noindex, noarchive',
@@ -15,24 +13,7 @@ const pageHeaders = {
   'Content-Type': 'text/html; charset=utf-8',
   'Content-Security-Policy': "default-src 'none'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'unsafe-inline'; img-src data:; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
 };
-const digest = value => createHash('sha256').update(value).digest();
-
-function authorized(request, password) {
-  const match = /^Basic ([A-Za-z0-9+/]+={0,2})$/i.exec(request.headers.get('authorization') ?? '');
-  if (!match) return false;
-  return timingSafeEqual(digest(Buffer.from(match[1], 'base64')), digest('report:' + password));
-}
-
 export async function GET(request) {
-  const password = process.env.REPORT_PASSWORD;
-  if (!password) return new Response('보고서 비밀번호를 설정해 주세요.', { status: 503, headers });
-  if (!authorized(request, password)) {
-    return new Response('로그인이 필요합니다.', {
-      status: 401,
-      headers: { ...headers, 'WWW-Authenticate': 'Basic realm="AROPET Weekly Cash Report", charset="UTF-8"' },
-    });
-  }
-
   const { pathname, searchParams } = new URL(request.url);
   const asset = searchParams.get('_report_asset');
   if (pathname === '/' || asset === 'page') {
