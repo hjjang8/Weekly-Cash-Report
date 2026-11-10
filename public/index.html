@@ -150,6 +150,16 @@
   .movement-table tbody td:last-child{font-weight:700;color:var(--deep-navy);}
   .movement-up{color:var(--income-text);}
   .movement-down{color:var(--expense-text);}
+
+  /* Burgundy main palette */
+  :root{--navy:#A83D56;--deep-navy:#321D28;--income-text:#A83D56;--accent-soft:#F8EDF0;}
+  body{background:radial-gradient(circle at 84% 2%,rgba(168,61,86,.07),transparent 25rem),var(--bg);}
+  .sidebar{background:radial-gradient(circle at 20% 5%,rgba(190,111,140,.2),transparent 17rem),linear-gradient(180deg,#371F2E,#21131C);}
+  .nav-item.active{background:#4B2B3B!important;}
+  .brand-mark{background:linear-gradient(145deg,#A83D56,#4B2B3B);box-shadow:0 10px 24px rgba(168,61,86,.38);}
+  .kpi-icon{color:#A83D56;}
+  .kpi-card.end-balance:before{background:#A83D56;}
+  @media(max-width:900px){.nav-item.active{border-bottom-color:#A83D56;}}
 </style>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" integrity="sha384-bs/nf9FbdNouRbMiFcrcZfLXYPKiPaGVGplVbv7dLGECccEXDW+S3zjqSKR5ZEaD" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js" integrity="sha384-y49Zu59jZHJL/PLKgZPv3k2WI9c0Yp3pWB76V8OBVCb0QBKS8l4Ff3YslzHVX76Y" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
