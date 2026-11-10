@@ -141,7 +141,7 @@
   .chart-status{position:absolute;inset:0;display:grid;place-items:center;margin:0;text-align:center;font-size:13px;color:var(--text-sub);}
   .chart-status[hidden]{display:none;}
   .movement-scroll{overflow-x:auto;border:1px solid var(--border);border-radius:12px;}
-  .movement-table{border-collapse:collapse;width:100%;min-width:560px;font-size:13px;}
+  .movement-table{border-collapse:collapse;table-layout:fixed;width:100%;min-width:720px;font-size:13px;}
   .movement-table th,.movement-table td{padding:10px 14px;border-bottom:1px solid var(--border);white-space:nowrap;}
   .movement-table thead th{text-align:center;background:#F6F7FA;color:var(--deep-navy);font-weight:700;}
   .movement-table tbody td{text-align:right;}
@@ -160,6 +160,11 @@
   .kpi-icon{color:#A83D56;}
   .kpi-card.end-balance:before{background:#A83D56;}
   @media(max-width:900px){.nav-item.active{border-bottom-color:#A83D56;}}
+
+  .kpi-icon.cash{background:#EAF6F0;color:#277B58;}
+  .kpi-icon.savings{background:#F8EDF0;color:#A83D56;}
+  .kpi-icon.forex{background:#F1ECF9;color:#7650B5;}
+  .kpi-icon.total{background:#EEF0F3;color:#4B5563;}
 </style>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" integrity="sha384-bs/nf9FbdNouRbMiFcrcZfLXYPKiPaGVGplVbv7dLGECccEXDW+S3zjqSKR5ZEaD" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js" integrity="sha384-y49Zu59jZHJL/PLKgZPv3k2WI9c0Yp3pWB76V8OBVCb0QBKS8l4Ff3YslzHVX76Y" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -190,22 +195,22 @@
       <p id="status" class="load-error" role="status"></p>
       <div class="kpi-grid" id="kpis" aria-busy="true">
       <article class="kpi-card" id="krw" aria-label="수시원화 잔액">
-        <div class="kpi-label"><span>수시원화 잔액</span><span class="kpi-icon income"><i data-lucide="arrow-down-to-line" aria-hidden="true"></i></span></div>
+        <div class="kpi-label"><span>수시원화 잔액</span><span class="kpi-icon cash"><i data-lucide="wallet" aria-hidden="true"></i></span></div>
         <div class="kpi-value"><span data-amount>—</span><span class="unit" hidden>억원</span></div>
         <div class="kpi-sub" data-note>기준일 확인 중</div>
       </article>
       <article class="kpi-card" id="deposit" aria-label="정기예적금 잔액">
-        <div class="kpi-label"><span>정기예적금 잔액</span><span class="kpi-icon expense"><i data-lucide="arrow-up-from-line" aria-hidden="true"></i></span></div>
+        <div class="kpi-label"><span>정기예적금 잔액</span><span class="kpi-icon savings"><i data-lucide="landmark" aria-hidden="true"></i></span></div>
         <div class="kpi-value"><span data-amount>—</span><span class="unit" hidden>억원</span></div>
         <div class="kpi-sub" data-note>기준일 확인 중</div>
       </article>
       <article class="kpi-card end-balance" id="fx" aria-label="수시외화 잔액">
-        <div class="kpi-label"><span>수시외화 잔액</span><span class="kpi-icon"><i data-lucide="circle-dollar-sign" aria-hidden="true"></i></span></div>
+        <div class="kpi-label"><span>수시외화 잔액</span><span class="kpi-icon forex"><i data-lucide="globe" aria-hidden="true"></i></span></div>
         <div class="kpi-value"><span data-amount>—</span><span class="unit" hidden>억원</span></div>
         <div class="kpi-sub" data-note>기준일 확인 중</div>
       </article>
       <article class="kpi-card current-balance" id="total" aria-label="합계">
-        <div class="kpi-label"><span>합계</span><span class="kpi-icon current"><i data-lucide="circle-dollar-sign" aria-hidden="true"></i></span></div>
+        <div class="kpi-label"><span>합계</span><span class="kpi-icon total"><i data-lucide="sigma" aria-hidden="true"></i></span></div>
         <div class="kpi-value"><span data-amount>—</span><span class="unit" hidden>억원</span></div>
         <div class="kpi-sub" data-note>기준일 확인 중</div>
       </article>

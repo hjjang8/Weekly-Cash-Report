@@ -76,6 +76,7 @@ function renderTrend(trend = []) {
       maintainAspectRatio: false,
       plugins: {
         legend: {
+          display: false,
           position: 'top',
           align: 'end',
           labels: { usePointStyle: true, pointStyle: 'circle', boxWidth: 8, boxHeight: 8, color: '#4B5768', font: { size: 12 } },
