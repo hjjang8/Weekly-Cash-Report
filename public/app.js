@@ -97,6 +97,25 @@ function renderTrend(trend = []) {
   });
 }
 
+function renderMovements(movements) {
+  const number = new Intl.NumberFormat('ko-KR', { maximumFractionDigits: 0 });
+  const amount = value => Number.isFinite(value) ? number.format(value) : '—';
+  const rows = movements.map(({ date, increase, decrease, net, closing }) => {
+    const row = document.createElement('tr');
+    const formattedNet = (net > 0 ? '+' : '') + amount(net);
+    const values = [dateLabel(date), amount(increase), amount(decrease), formattedNet, amount(closing)];
+    const classes = ['', 'movement-up', 'movement-down', net > 0 ? 'movement-up' : net < 0 ? 'movement-down' : '', ''];
+    values.forEach((value, index) => {
+      const cell = document.createElement('td');
+      cell.textContent = value;
+      cell.className = classes[index];
+      row.append(cell);
+    });
+    return row;
+  });
+  get('movementRows').replaceChildren(...rows);
+}
+
 async function loadBalances(requestedWeek) {
   weekSelect.disabled = true;
   get('kpis').setAttribute('aria-busy', 'true');
@@ -124,6 +143,7 @@ async function loadBalances(requestedWeek) {
     get('footer').textContent = preview
       ? '구글 스프레드시트에서 확인한 잔액으로 만든 미리보기 · 경영지원실'
       : '본 보고서는 구글 스프레드시트 데이터와 실시간 연동됩니다. · 경영지원실';
+    renderMovements(data.movements ?? []);
     displayedWeek = data.week;
     try {
       renderTrend(data.trend);

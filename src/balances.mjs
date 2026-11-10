@@ -6,6 +6,13 @@ const headers = {
   converted: '잔액(환산)',
 };
 
+const movementHeaders = {
+  increase: '입금액',
+  decrease: '출금액',
+  increaseConverted: '입금액(환산)',
+  decreaseConverted: '출금액(환산)',
+};
+
 function balanceDate(value) {
   const input = String(value ?? '').trim();
   let date = input.replace(/[-.\/\s]/g, '');
@@ -42,10 +49,10 @@ function won(value) {
 
 export function summarize(week, rows) {
   const [header = [], ...data] = rows;
-  const columns = Object.fromEntries(Object.entries(headers).map(
+  const columns = Object.fromEntries(Object.entries({ ...headers, ...movementHeaders }).map(
     ([key, label]) => [key, header.findIndex(value => String(value).trim() === label)],
   ));
-  if (Object.values(columns).includes(-1)) throw new Error('Missing balance headers');
+  if (Object.keys(headers).some(key => columns[key] === -1)) throw new Error('Missing balance headers');
 
   const latest = { krw: null, deposit: null, fx: null };
   const daily = new Map();
@@ -54,25 +61,38 @@ export function summarize(week, rows) {
     const key = category(String(row[columns.kind] ?? '').trim(), currency);
     if (!key || row[columns.date] === '' || row[columns.date] == null) continue;
     const date = balanceDate(row[columns.date]);
-    if (!daily.has(date)) daily.set(date, {});
-    const groups = daily.get(date);
-    groups[key] ??= [];
-    groups[key].push(row[currency === 'KRW' ? columns.raw : columns.converted]);
-    if (!latest[key] || latest[key].date < date) latest[key] = { date, amounts: groups[key] };
+    if (!daily.has(date)) daily.set(date, { groups: {}, increase: 0, decrease: 0 });
+    const day = daily.get(date);
+    const amounts = day.groups[key] ??= [];
+    const domestic = currency === 'KRW';
+    amounts.push(row[domestic ? columns.raw : columns.converted]);
+    if (!latest[key] || latest[key].date < date) latest[key] = { date, amounts };
+
+    const increase = row[domestic ? columns.increase : columns.increaseConverted];
+    const decrease = row[domestic ? columns.decrease : columns.decreaseConverted];
+    day.increase += Number.isFinite(increase) ? increase : NaN;
+    day.decrease += Number.isFinite(decrease) ? decrease : NaN;
   }
 
   const balances = Object.fromEntries(Object.entries(latest).map(([key, item]) => [
     key, item && { date: item.date, amount: sum(item.amounts.map(won)) },
   ]));
   const keys = Object.keys(balances);
-  const trend = [...daily.keys()].sort().map(date => {
-    const groups = daily.get(date);
-    const complete = keys.every(key => groups[key]?.every(Number.isFinite));
+  const movements = [...daily.keys()].sort().map(date => {
+    const { groups, increase, decrease } = daily.get(date);
+    const hasAllCategories = keys.every(key => groups[key]);
+    const completeBalances = keys.every(key => groups[key]?.every(Number.isFinite));
+    const incoming = hasAllCategories && Number.isFinite(increase) ? increase : null;
+    const outgoing = hasAllCategories && Number.isFinite(decrease) ? decrease : null;
     return {
       date,
-      amount: complete ? sum(keys.map(key => sum(groups[key]))) : null,
+      increase: incoming,
+      decrease: outgoing,
+      net: incoming === null || outgoing === null ? null : incoming - outgoing,
+      closing: completeBalances ? sum(keys.map(key => sum(groups[key]))) : null,
     };
   });
+  const trend = movements.map(({ date, closing }) => ({ date, amount: closing }));
   const available = Object.values(balances).filter(Boolean);
   const dates = [...new Set(available.map(item => item.date))].sort();
   return {
@@ -80,6 +100,7 @@ export function summarize(week, rows) {
     asOf: dates.at(-1) ?? null,
     balances,
     trend,
+    movements,
     total: available.length === keys.length
       ? { date: dates.length === 1 ? dates[0] : null, amount: sum(available.map(item => item.amount)) }
       : null,
