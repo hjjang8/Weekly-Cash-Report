@@ -2,6 +2,7 @@ const get = id => document.getElementById(id);
 const format = new Intl.NumberFormat('ko-KR', {
   minimumFractionDigits: 1, maximumFractionDigits: 1,
 });
+const axisNumber = new Intl.NumberFormat('ko-KR', { maximumFractionDigits: 8 });
 const exact = new Intl.NumberFormat('ko-KR', { maximumFractionDigits: 2 });
 const weekSelect = get('weekSelect');
 const dateLabel = date => date.replaceAll('-', '. ') + '.';
@@ -96,7 +97,7 @@ function renderTrend(trend = [], category = 'total') {
       },
       scales: {
         x: { grid: { display: false }, ticks: { color: '#7C8898', font: { size: 11.5 } } },
-        y: { grace: '12%', grid: { color: '#EEF1F5' }, ticks: { color: '#7C8898', font: { size: 11.5 }, callback: value => value + '억' } },
+        y: { grace: '12%', grid: { color: '#EEF1F5' }, ticks: { color: '#7C8898', font: { size: 11.5 }, callback: value => axisNumber.format(value) + '억' } },
       },
     },
   });
