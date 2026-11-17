@@ -165,6 +165,12 @@
   .kpi-icon.savings{background:#F8EDF0;color:#A83D56;}
   .kpi-icon.forex{background:#F1ECF9;color:#7650B5;}
   .kpi-icon.total{background:#EEF0F3;color:#4B5563;}
+
+  .chart-category-buttons{display:flex;flex-wrap:wrap;gap:4px;margin-left:auto;}
+  .chart-category-buttons button{font:inherit;font-size:12px;font-weight:600;color:var(--text-sub);background:var(--card);border:1px solid var(--border);border-radius:6px;padding:5px 9px;cursor:pointer;white-space:nowrap;}
+  .chart-category-buttons button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:white;}
+  .chart-category-buttons button:focus-visible{outline:2px solid var(--navy);outline-offset:2px;}
+  .card:has(.chart-category-buttons) .summary-card-head{flex-wrap:wrap;}
 </style>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" integrity="sha384-bs/nf9FbdNouRbMiFcrcZfLXYPKiPaGVGplVbv7dLGECccEXDW+S3zjqSKR5ZEaD" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js" integrity="sha384-y49Zu59jZHJL/PLKgZPv3k2WI9c0Yp3pWB76V8OBVCb0QBKS8l4Ff3YslzHVX76Y" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -219,6 +225,12 @@
         <div class="chart-kicker">DAILY CASH BALANCE TREND</div>
         <div class="summary-card-head">
           <h2 class="card-title" id="trendTitle">일자별 잔액 추이</h2>
+          <div class="chart-category-buttons" id="trendCategories" role="group" aria-labelledby="trendTitle">
+<button type="button" data-category="total" aria-pressed="true">합계</button>
+<button type="button" data-category="krw" aria-pressed="false">수시원화</button>
+<button type="button" data-category="deposit" aria-pressed="false">정기예적금</button>
+<button type="button" data-category="fx" aria-pressed="false">수시외화</button>
+          </div>
           <span class="table-unit">단위: 억원</span>
         </div>
         <div class="chart-wrap">
@@ -230,6 +242,12 @@
         <div class="chart-kicker">DAILY CASH MOVEMENTS</div>
         <div class="summary-card-head">
           <h2 class="card-title" id="movementTitle">일자별 증가·감소</h2>
+          <div class="chart-category-buttons" id="movementCategories" role="group" aria-labelledby="movementTitle">
+<button type="button" data-category="total" aria-pressed="true">합계</button>
+<button type="button" data-category="krw" aria-pressed="false">수시원화</button>
+<button type="button" data-category="deposit" aria-pressed="false">정기예적금</button>
+<button type="button" data-category="fx" aria-pressed="false">수시외화</button>
+          </div>
           <span class="table-unit">단위: 원</span>
         </div>
         <div class="movement-scroll" tabindex="0" role="region" aria-label="일자별 증가·감소 표">

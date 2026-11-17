@@ -61,7 +61,7 @@ export function summarize(week, rows) {
     const key = category(String(row[columns.kind] ?? '').trim(), currency);
     if (!key || row[columns.date] === '' || row[columns.date] == null) continue;
     const date = balanceDate(row[columns.date]);
-    if (!daily.has(date)) daily.set(date, { groups: {}, increase: 0, decrease: 0 });
+    if (!daily.has(date)) daily.set(date, { groups: {}, increase: 0, decrease: 0, flows: {} });
     const day = daily.get(date);
     const amounts = day.groups[key] ??= [];
     const domestic = currency === 'KRW';
@@ -70,15 +70,21 @@ export function summarize(week, rows) {
 
     const increase = row[domestic ? columns.increase : columns.increaseConverted];
     const decrease = row[domestic ? columns.decrease : columns.decreaseConverted];
-    day.increase += Number.isFinite(increase) ? increase : NaN;
-    day.decrease += Number.isFinite(decrease) ? decrease : NaN;
+    const flow = day.flows[key] ??= { increase: 0, decrease: 0 };
+    const incoming = Number.isFinite(increase) ? increase : NaN;
+    const outgoing = Number.isFinite(decrease) ? decrease : NaN;
+    day.increase += incoming;
+    day.decrease += outgoing;
+    flow.increase += incoming;
+    flow.decrease += outgoing;
   }
 
   const balances = Object.fromEntries(Object.entries(latest).map(([key, item]) => [
     key, item && { date: item.date, amount: sum(item.amounts.map(won)) },
   ]));
   const keys = Object.keys(balances);
-  const movements = [...daily.keys()].sort().map(date => {
+  const orderedDates = [...daily.keys()].sort();
+  const movements = orderedDates.map(date => {
     const { groups, increase, decrease } = daily.get(date);
     const hasAllCategories = keys.every(key => groups[key]);
     const completeBalances = keys.every(key => groups[key]?.every(Number.isFinite));
@@ -92,6 +98,19 @@ export function summarize(week, rows) {
       closing: completeBalances ? sum(keys.map(key => sum(groups[key]))) : null,
     };
   });
+  const movementsByCategory = Object.fromEntries(keys.map(key => [key, orderedDates.map(date => {
+    const { groups, flows } = daily.get(date);
+    const flow = flows[key];
+    const increase = Number.isFinite(flow?.increase) ? flow.increase : null;
+    const decrease = Number.isFinite(flow?.decrease) ? flow.decrease : null;
+    return {
+      date,
+      increase,
+      decrease,
+      net: increase === null || decrease === null ? null : increase - decrease,
+      closing: groups[key]?.every(Number.isFinite) ? sum(groups[key]) : null,
+    };
+  })]));
   const trend = movements.map(({ date, closing }) => ({ date, amount: closing }));
   const available = Object.values(balances).filter(Boolean);
   const dates = [...new Set(available.map(item => item.date))].sort();
@@ -101,6 +120,7 @@ export function summarize(week, rows) {
     balances,
     trend,
     movements,
+    movementsByCategory,
     total: available.length === keys.length
       ? { date: dates.length === 1 ? dates[0] : null, amount: sum(available.map(item => item.amount)) }
       : null,

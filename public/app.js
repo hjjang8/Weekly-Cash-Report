@@ -7,6 +7,10 @@ const weekSelect = get('weekSelect');
 const dateLabel = date => date.replaceAll('-', '. ') + '.';
 let displayedWeek = '';
 let balanceChart;
+let report;
+let trendCategory = 'total';
+let movementCategory = 'total';
+const categoryLabels = {"total":"합계","krw":"수시원화","deposit":"정기예적금","fx":"수시외화"};
 
 function renderBalance(id, balance, note) {
   const card = get(id);
@@ -19,7 +23,8 @@ function renderBalance(id, balance, note) {
   else amount.parentElement.removeAttribute('title');
 }
 
-function renderTrend(trend = []) {
+function renderTrend(trend = [], category = 'total') {
+  const label = category === 'total' ? '합산 잔액' : categoryLabels[category] + ' 잔액';
   const canvas = get('balanceChart');
   const status = get('trendStatus');
   balanceChart?.destroy();
@@ -27,7 +32,7 @@ function renderTrend(trend = []) {
   canvas.hidden = true;
   status.hidden = false;
   if (!trend.some(point => point.amount !== null)) {
-    status.textContent = '일자별 합산 잔액이 없습니다.';
+    status.textContent = '일자별 ' + label + '이 없습니다.';
     return;
   }
   const { Chart, ChartDataLabels } = window;
@@ -36,10 +41,9 @@ function renderTrend(trend = []) {
     return;
   }
 
-  const label = '합산 잔액';
   const labels = trend.map(({ date }) => date.slice(5).replace('-', '/'));
   const amounts = trend.map(({ amount }) => amount === null ? null : Math.round(amount / 1e7) / 10);
-  canvas.setAttribute('aria-label', '일자별 합산 잔액 (억원). ' + labels.map((date, index) =>
+  canvas.setAttribute('aria-label', '일자별 ' + label + ' (억원). ' + labels.map((date, index) =>
     date + ' ' + (amounts[index] === null ? '집계 없음' : format.format(amounts[index])),
   ).join(', '));
   canvas.hidden = false;
@@ -144,15 +148,10 @@ async function loadBalances(requestedWeek) {
     get('footer').textContent = preview
       ? '구글 스프레드시트에서 확인한 잔액으로 만든 미리보기 · 경영지원실'
       : '본 보고서는 구글 스프레드시트 데이터와 실시간 연동됩니다. · 경영지원실';
-    renderMovements(data.movements ?? []);
+    report = data;
+    updateMovements();
     displayedWeek = data.week;
-    try {
-      renderTrend(data.trend);
-    } catch {
-      get('balanceChart').hidden = true;
-      get('trendStatus').hidden = false;
-      get('trendStatus').textContent = '그래프를 표시하지 못했습니다.';
-    }
+    updateTrend();
   } catch (error) {
     get('status').textContent = displayedWeek
       ? '잔액 조회에 실패해 마지막으로 조회한 주차를 표시합니다.'
@@ -169,6 +168,45 @@ async function loadBalances(requestedWeek) {
   }
 }
 
+function categoryMovements(category) {
+  return category === 'total' ? report.movements ?? [] : report.movementsByCategory?.[category] ?? [];
+}
+
+function updateTrend() {
+  if (!report) return;
+  const trend = trendCategory === 'total' ? report.trend : categoryMovements(trendCategory)
+    .map(({ date, closing }) => ({ date, amount: closing }));
+  try {
+    renderTrend(trend, trendCategory);
+  } catch {
+    get('balanceChart').hidden = true;
+    get('trendStatus').hidden = false;
+    get('trendStatus').textContent = '그래프를 표시하지 못했습니다.';
+  }
+}
+
+function updateMovements() {
+  if (report) renderMovements(categoryMovements(movementCategory));
+}
+
+function bindCategoryButtons(id, selectCategory) {
+  const buttons = [...get(id).querySelectorAll('button[data-category]')];
+  for (const button of buttons) {
+    button.addEventListener('click', () => {
+      for (const option of buttons) option.setAttribute('aria-pressed', String(option === button));
+      selectCategory(button.dataset.category);
+    });
+  }
+}
+
+bindCategoryButtons('trendCategories', category => {
+  trendCategory = category;
+  updateTrend();
+});
+bindCategoryButtons('movementCategories', category => {
+  movementCategory = category;
+  updateMovements();
+});
 window.lucide?.createIcons();
 weekSelect.addEventListener('change', () => loadBalances(weekSelect.value));
 loadBalances();
