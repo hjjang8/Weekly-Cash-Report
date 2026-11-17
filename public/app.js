@@ -6,6 +6,10 @@ const axisNumber = new Intl.NumberFormat('ko-KR', { maximumFractionDigits: 8 });
 const exact = new Intl.NumberFormat('ko-KR', { maximumFractionDigits: 2 });
 const weekSelect = get('weekSelect');
 const dateLabel = date => date.replaceAll('-', '. ') + '.';
+const trendDateLabel = date => {
+  const weekday = '일월화수목금토'[new Date(date).getUTCDay()];
+  return date.slice(5).replace('-', '/') + '(' + weekday + ')';
+};
 let displayedWeek = '';
 let balanceChart;
 let report;
@@ -42,7 +46,7 @@ function renderTrend(trend = [], category = 'total') {
     return;
   }
 
-  const labels = trend.map(({ date }) => date.slice(5).replace('-', '/'));
+  const labels = trend.map(({ date }) => trendDateLabel(date));
   const amounts = trend.map(({ amount }) => amount === null ? null : Math.round(amount / 1e7) / 10);
   canvas.setAttribute('aria-label', '일자별 ' + label + ' (억원). ' + labels.map((date, index) =>
     date + ' ' + (amounts[index] === null ? '집계 없음' : format.format(amounts[index])),
