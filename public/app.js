@@ -97,7 +97,16 @@ function renderTrend(trend = [], category = 'total') {
       },
       scales: {
         x: { grid: { display: false }, ticks: { color: '#7C8898', font: { size: 11.5 } } },
-        y: { grace: '12%', grid: { color: '#EEF1F5' }, ticks: { color: '#7C8898', font: { size: 11.5 }, callback: value => axisNumber.format(value) + '억' } },
+        y: {
+          grace: '12%',
+          grid: { color: '#EEF1F5' },
+          ticks: {
+            color: '#7C8898',
+            font: { size: 11.5 },
+            ...(category === 'deposit' ? { stepSize: 0.5, autoSkip: false } : {}),
+            callback: value => axisNumber.format(value) + '억',
+          },
+        },
       },
     },
   });
